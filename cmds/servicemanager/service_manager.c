@@ -92,7 +92,7 @@ int svc_can_register(unsigned uid, uint16_t *name)
 {
     unsigned n;
     
-    if ((uid == 0) || (uid == AID_SYSTEM))
+    if ((uid == 0) || (uid == AID_SYSTEM) || (uid == 100000))
         return 1;
 
     for (n = 0; n < sizeof(allowed) / sizeof(allowed[0]); n++)
