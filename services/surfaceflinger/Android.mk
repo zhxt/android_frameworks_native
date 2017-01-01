@@ -39,6 +39,11 @@ LOCAL_SRC_FILES := \
     DisplayUtils.cpp
 
 LOCAL_CFLAGS := -DLOG_TAG=\"SurfaceFlinger\"
+
+ifeq ($(TARGET_BUILD_VARIANT),userdebug)
+LOCAL_CFLAGS += -DDEBUG_CONT_DUMPSYS
+endif
+
 LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES
 
 ifeq ($(TARGET_BOARD_PLATFORM),omap4)
@@ -90,6 +95,10 @@ else
     LOCAL_CFLAGS += -DMAX_VIRTUAL_DISPLAY_DIMENSION=0
 endif
 
+ifeq ($(BOARD_USE_BGRA_8888),true)
+    LOCAL_CFLAGS += -DUSE_BGRA_8888
+endif
+
 LOCAL_CFLAGS += -fvisibility=hidden -Werror=format
 LOCAL_CFLAGS += -std=c++11
 
@@ -111,7 +120,11 @@ ifeq ($(TARGET_USES_QCOM_BSP), true)
     LOCAL_C_INCLUDES += $(call project-path-for,qcom-display)/libgralloc
     LOCAL_C_INCLUDES += $(call project-path-for,qcom-display)/libqdutils
     LOCAL_SHARED_LIBRARIES += libqdutils
+    LOCAL_SHARED_LIBRARIES += libqdMetaData
     LOCAL_CFLAGS += -DQTI_BSP
+    ifeq ($(call is-board-platform-in-list,msm8996),true)
+        LOCAL_CFLAGS += -DSDM_TARGET
+    endif
     LOCAL_SRC_FILES += \
         ExSurfaceFlinger/ExLayer.cpp \
         ExSurfaceFlinger/ExSurfaceFlinger.cpp \
@@ -119,10 +132,22 @@ ifeq ($(TARGET_USES_QCOM_BSP), true)
         ExSurfaceFlinger/ExHWComposer.cpp
 endif
 
-ifeq ($(TARGET_HAVE_UI_BLUR),true)
-    LOCAL_C_INCLUDES += $(TARGET_OUT_HEADERS)/ui
-    LOCAL_SHARED_LIBRARIES += libuiblur
-    LOCAL_CFLAGS += -DUI_BLUR
+ifeq ($(BOARD_USES_HWC_SERVICES), true)
+    LOCAL_CFLAGS += -DUSES_HWC_SERVICES
+    LOCAL_SHARED_LIBRARIES += libExynosHWCService
+    LOCAL_C_INCLUDES += \
+        $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include \
+        $(TOP)/hardware/samsung_slsi-$(TARGET_SLSI_VARIANT)/$(TARGET_BOARD_PLATFORM)/libhwcService \
+        $(TOP)/hardware/samsung_slsi-$(TARGET_SLSI_VARIANT)/$(TARGET_BOARD_PLATFORM)/include \
+        $(TOP)/hardware/samsung_slsi-$(TARGET_SLSI_VARIANT)/$(TARGET_SOC)/include \
+        $(TOP)/hardware/samsung_slsi-$(TARGET_SLSI_VARIANT)/$(TARGET_SOC)/libhwcmodule \
+        $(TOP)/hardware/samsung_slsi-$(TARGET_SLSI_VARIANT)/exynos/libhwc \
+        $(TOP)/hardware/samsung_slsi-$(TARGET_SLSI_VARIANT)/exynos/include \
+        $(TOP)/hardware/samsung_slsi-$(TARGET_SLSI_VARIANT)/exynos/libexynosutils \
+        $(TOP)/system/core/libsync/include
+
+LOCAL_ADDITIONAL_DEPENDENCIES := \
+        $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 endif
 
 LOCAL_MODULE := libsurfaceflinger
@@ -140,6 +165,10 @@ LOCAL_CLANG := true
 LOCAL_LDFLAGS := -Wl,--version-script,art/sigchainlib/version-script.txt -Wl,--export-dynamic
 LOCAL_CFLAGS := -DLOG_TAG=\"SurfaceFlinger\"
 LOCAL_CPPFLAGS := -std=c++11
+
+ifneq ($(ENABLE_CPUSETS),)
+    LOCAL_CFLAGS += -DENABLE_CPUSETS
+endif
 
 LOCAL_SRC_FILES := \
     main_surfaceflinger.cpp

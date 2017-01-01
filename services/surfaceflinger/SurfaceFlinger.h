@@ -146,6 +146,9 @@ private:
     friend class DisplayEventConnection;
     friend class Layer;
     friend class LayerDim;
+#ifdef QTI_BSP
+    friend class ExLayer;
+#endif
     friend class MonitoredProducer;
     friend class LayerBlur;
 
@@ -471,6 +474,7 @@ private:
     void logFrameStats();
 
     void dumpStaticScreenStats(String8& result) const;
+    virtual void dumpDrawCycle(bool /* prePrepare */ ) { }
 
     /* ------------------------------------------------------------------------
      * Attributes
@@ -551,6 +555,9 @@ private:
 
     mat4 mColorMatrix;
     bool mHasColorMatrix;
+
+    mat4 mSecondaryColorMatrix;
+    bool mHasSecondaryColorMatrix;
 
     // Static screen stats
     bool mHasPoweredOff;

@@ -95,11 +95,15 @@ public:
     };
 
     struct Geometry {
+        float x;
+        float y;
         uint32_t w;
         uint32_t h;
+        bool isPositionPending;
         Rect crop;
         inline bool operator ==(const Geometry& rhs) const {
-            return (w == rhs.w && h == rhs.h && crop == rhs.crop);
+            return (w == rhs.w && h == rhs.h && crop == rhs.crop && x == rhs.x && y == rhs.y
+                && isPositionPending == rhs.isPositionPending);
         }
         inline bool operator !=(const Geometry& rhs) const {
             return !operator ==(rhs);
@@ -158,8 +162,13 @@ public:
     uint32_t getTransactionFlags(uint32_t flags);
     uint32_t setTransactionFlags(uint32_t flags);
 
+#ifdef QTI_BSP
+    virtual void computeGeometry(const sp<const DisplayDevice>& hw, Mesh& mesh,
+            bool useIdentityTransform) const;
+#else
     void computeGeometry(const sp<const DisplayDevice>& hw, Mesh& mesh,
             bool useIdentityTransform) const;
+#endif
     Rect computeBounds(const Region& activeTransparentRegion) const;
     Rect computeBounds() const;
 
@@ -388,9 +397,14 @@ private:
     // drawing
     void clearWithOpenGL(const sp<const DisplayDevice>& hw, const Region& clip,
             float r, float g, float b, float alpha) const;
+#ifdef QTI_BSP
+    virtual void drawWithOpenGL(const sp<const DisplayDevice>& hw, const Region& clip,
+            bool useIdentityTransform) const;
+#else
     void drawWithOpenGL(const sp<const DisplayDevice>& hw, const Region& clip,
             bool useIdentityTransform) const;
 
+#endif
     // Temporary - Used only for LEGACY camera mode.
     uint32_t getProducerStickyTransform() const;
 

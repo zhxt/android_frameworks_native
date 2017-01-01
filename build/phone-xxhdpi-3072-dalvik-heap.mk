@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 The CyanogenMod Project
+# Copyright (C) 2016 The CyanogenMod Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,5 +21,5 @@ PRODUCT_PROPERTY_OVERRIDES += \
     dalvik.vm.heapgrowthlimit=288m \
     dalvik.vm.heapsize=768m \
     dalvik.vm.heaptargetutilization=0.75 \
-    dalvik.vm.heapminfree=2m \
+    dalvik.vm.heapminfree=512k \
     dalvik.vm.heapmaxfree=8m
