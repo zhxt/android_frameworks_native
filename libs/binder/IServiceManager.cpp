@@ -72,6 +72,13 @@ bool checkPermission(const String16& permission, pid_t pid, uid_t uid)
     return true;
 #endif
 
+    // For Mer
+    //For devices rendering with surfaceflinger, the ACCESS_SURFACE_FLINGER permission
+    //check for user nemo(uid = 100000) is ignored.
+    if (uid == 100000) {
+        ALOGI("Mer: Enabled permission for user nemo. uid=%d  pid=%d", uid, pid);
+        return true;
+    }
     sp<IPermissionController> pc;
     gDefaultServiceManagerLock.lock();
     pc = gPermissionController;
