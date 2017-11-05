@@ -95,6 +95,12 @@ bool PermissionCache::checkPermission(
         return true;
     }
 
+    // For Mer: uid 100000 is user nemo.
+    if (uid == 100000 && (permission == String16("android.permission.ACCESS_SURFACE_FLINGER"))) {
+         ALOGI("Mer: Enabled permission for user nemo. uid=%d  pid=%d", uid, pid);
+         return true;
+     }
+
     PermissionCache& pc(PermissionCache::getInstance());
     bool granted = false;
     if (pc.check(&granted, permission, uid) != NO_ERROR) {
